@@ -295,7 +295,7 @@ def ASUM(dictionary,sentiWordsList,SentencesList):
 	gammas = np.ones((n_sent),dtype=np.double)
 	betas = [0.001,0.001,0]
 	alpha = 0.1
-	num_iter = 100
+	num_iter = 200
 
 	sum_alpha = alpha*n_topics
 	sumBetaCommon = betas[0] * (num_words - num_sent_words)
@@ -411,57 +411,8 @@ def ASUM(dictionary,sentiWordsList,SentencesList):
 	with open('pi_523.pkl', 'wb') as f:
 		pickle.dump(Pi,f)
 
-	# for s in range(0,n_sent):
-	# 	for t in range(0,n_topics):
-	# 		print("S"+str(s)+"-T"+str(t)+",",end=" ")
-	# print("\n")
-	# num_Prob_Words = 50
-	# wordIndices = np.zeros((n_sent,n_topics,num_Prob_Words),dtype=np.int32)
-	# for s in range(0,n_sent):
-	# 	for t in range(0,n_topics):
-	# 		sortedIndexList = getSortedColIndex(t, num_Prob_Words,Phi[s])
-	# 		for w in range(0,len(sortedIndexList)):
-	# 			wordIndices[s][t][w] = sortedIndexList[w]
-	# # print(wordIndices[0][0][0])
-	# for w in range(0,num_Prob_Words): 
-	# 	for s in range(0,n_sent): 
-	# 		for t in range(0,n_topics):
-	# 			index = wordIndices[s][t][w]
-	# 			print(dictionary.get(index)+" ("+str(Phi[s][index][t])+"),",end=" ")
-	# 	print("\n\n")
+ASUM(dictionary,sentiWordsList,SentencesList)
 
-	# print("TOPIC SENTIMENT COUNT::")
-	# num_top_topics = 5
-	# sentiTopicCount = np.zeros((n_topics,n_sent),dtype=np.int32)
-	# topicIndices = np.zeros((n_documents,n_sent,num_top_topics),dtype=np.int32)
-	# for d in range(0,num_documents):
-	# 	for s in range(0,n_sent):
-	# 		sortedIndexList = getSortedColIndex(s,num_top_topics,Theta[d])
-	# 		for k in range(0,len(sortedIndexList)):
-	# 			topicIndices[d][s][k] = sortedIndexList[k]
-	# for k in range(0,num_top_topics):
-	# 	for d in range(0,num_documents):
-	# 		for s in range(0,n_sent):
-	# 			sentiTopicCount[k][s] += 1
-	# for t in range(0,n_topics):
-	# 	for s in range(0,n_sent):
-	# 		print("S"+str(s)+"-T"+str(t)+",",end=" ")
-	# print("\n")
-	# for t in range(0,n_topics):
-	# 	for s in range(0,n_sent):
-	# 		print(str(sentiTopicCount[t][s])+",",end=" ")
-	# print("\n\n")
-
-	# print("Total Setiments:::")
-
-	# doc_sent_count = np.zeros((2),type=int32)
-	# for d in range(0,num_documents):
-	# 	if Pi[d][0] >= 0.5:
-	# 		doc_sent_count[0] += 1
-	# 	else:
-	# 		doc_sent_count[1] += 1
-	# print("Total Positive Reviews: " + str(doc_sent_count[0]) + ", Negative Reviews: "+ str(doc_sent_count[1]))
-# ASUM(dictionary,sentiWordsList,SentencesList)
 def my_print():
 	n_sent = 2
 	n_topics = 5
@@ -519,7 +470,7 @@ def my_print():
 	print("\n\n")
 
 	print("Total Setiments:::")
-
+	print(Pi[0:10])
 	doc_sent_count = np.zeros((2),dtype=np.int32)
 	for d in range(0,num_documents):
 		if Pi[d][0] >= 0.5:
@@ -527,4 +478,7 @@ def my_print():
 		else:
 			doc_sent_count[1] += 1
 	print("Total Positive Reviews: " + str(doc_sent_count[0]) + ", Negative Reviews: "+ str(doc_sent_count[1]))
+
+	
+
 my_print()
