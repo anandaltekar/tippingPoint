@@ -144,7 +144,79 @@ def make_bold(val):
 
 # Apply Style
 df_document_topics = df_document_topic.head(15).style.applymap(color_green).applymap(make_bold)
-df_document_topics
+print(df_document_topics)
+
+#REVIEW TOPIC DISTRIBUTIONS ACROSS DOCUMENTS
+
+df_topic_distribution = df_document_topic['dominant_topic'].value_counts().reset_index(name="Num Documents")
+df_topic_distribution.columns = ['Topic Num', 'Num Documents']
+print(df_topic_distribution)
+
+#HOW TO VISUALIZE THE LDA MODEL
+
+pyLDAvis.enable_notebook()
+panel = pyLDAvis.sklearn.prepare(best_lda_model, data_vectorized, vectorizer, mds='tsne')
+print(panel)
+
+#HOW TO SEE THE TOPIC'S KEYBOARD
+# Topic-Keyword Matrix
+df_topic_keywords = pd.DataFrame(best_lda_model.components_)
+
+# Assign Column and Index
+df_topic_keywords.columns = vectorizer.get_feature_names()
+df_topic_keywords.index = topicnames
+
+# View
+print(df_topic_keywords.head(5))
+
+#TOP 15 KEYWORDS FROM EACH TOPIC
+# Show top n keywords for each topic
+def show_topics(vectorizer=vectorizer, lda_model=lda_model, n_words=20):
+    keywords = np.array(vectorizer.get_feature_names())
+    topic_keywords = []
+    for topic_weights in lda_model.components_:
+        top_keyword_locs = (-topic_weights).argsort()[:n_words]
+        topic_keywords.append(keywords.take(top_keyword_locs))
+    return topic_keywords
+
+topic_keywords = show_topics(vectorizer=vectorizer, lda_model=best_lda_model, n_words=15)        
+
+# Topic - Keywords Dataframe
+df_topic_keywords = pd.DataFrame(topic_keywords)
+df_topic_keywords.columns = ['Word '+str(i) for i in range(df_topic_keywords.shape[1])]
+df_topic_keywords.index = ['Topic '+str(i) for i in range(df_topic_keywords.shape[0])]
+print(df_topic_keywords)
+
+#PREDICT TOPICS FROM A NEW PIECE OF TEXT
+
+# Define function to predict topic for a given text document.
+nlp = spacy.load('en', disable=['parser', 'ner'])
+
+def predict_topic(text, nlp=nlp):
+    global sent_to_words
+    global lemmatization
+
+    # Step 1: Clean with simple_preprocess
+    mytext_2 = list(sent_to_words(text))
+
+    # Step 2: Lemmatize
+    mytext_3 = lemmatization(mytext_2, allowed_postags=['NOUN', 'ADJ', 'VERB', 'ADV'])
+
+    # Step 3: Vectorize transform
+    mytext_4 = vectorizer.transform(mytext_3)
+
+    # Step 4: LDA Transform
+    topic_probability_scores = best_lda_model.transform(mytext_4)
+    topic = df_topic_keywords.iloc[np.argmax(topic_probability_scores), :].values.tolist()
+    return topic, topic_probability_scores
+
+# Predict the topic
+mytext = ["Some text about christianity and bible"]
+topic, prob_scores = predict_topic(text = mytext)
+print(topic)
+
+#CLUSTER DOCUMENTS THAT SHARE SIMILAR TOPICS AND PLOT
+
 
 
 
